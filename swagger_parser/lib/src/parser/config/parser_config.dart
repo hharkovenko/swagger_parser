@@ -18,6 +18,7 @@ class ParserConfig {
     this.includeTags = const <String>[],
     this.fallbackClient = 'fallback',
     this.inferRequiredFromNullable = false,
+    this.stripQueryParamsFromPath = false,
   });
 
   /// Specification file content as [String]
@@ -80,4 +81,9 @@ class ParserConfig {
   /// Properties without nullable: true in schema are marked as required.
   /// Only applies when schema has no explicit required array.
   final bool inferRequiredFromNullable;
+
+  /// If `true`, strip query parameter templates from API paths.
+  /// For example, "/api/path{?param1,param2}" becomes "/api/path".
+  /// This is useful for schemas that include RFC 6570 URI templates.
+  final bool stripQueryParamsFromPath;
 }

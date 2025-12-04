@@ -583,6 +583,13 @@ class OpenApiParser {
       return types;
     }
 
+    /// Strip query parameter templates from path
+    String stripQueryParams(String path) {
+      // Remove RFC 6570 URI template query params like {?param1,param2}
+      final queryParamRegex = RegExp(r'\{\?[^}]*\}');
+      return path.replaceAll(queryParamRegex, '');
+    }
+
     if (!_definitionFileContent.containsKey(_pathsConst)) {
       return [];
     }
@@ -591,6 +598,10 @@ class OpenApiParser {
       pathValue,
     ) {
       final pathValueMap = pathValue as Map<String, dynamic>;
+      // Strip query params from path if configured
+      final processedPath = config.stripQueryParamsFromPath
+          ? stripQueryParams(path)
+          : path;
 
       // global parameters are defined at the path level (i.e. /users/{id})
       final globalParameters = <UniversalRequestType>[];
@@ -622,7 +633,7 @@ class OpenApiParser {
 
           final requestPathResponses =
               requestPath[_responsesConst] as Map<String, dynamic>;
-          final additionalName = '$key${path}Response'.toPascal;
+          final additionalName = '$key${processedPath}Response'.toPascal;
           final returnType = _apiInfo.schemaVersion == OAS.v2
               ? returnTypeV2(requestPathResponses, additionalName)
               : returnTypeV3(requestPathResponses, additionalName);
@@ -666,16 +677,16 @@ class OpenApiParser {
           String? operationIdName;
 
           if (config.pathMethodName) {
-            requestName = (key + path).toCamel;
+            requestName = (key + processedPath).toCamel;
           } else {
             rawOperationId = requestPath[_operationIdConst]?.toString();
             operationIdName = rawOperationId?.toCamel;
             final (_, nameDescription) = protectName(operationIdName);
             if (nameDescription != null) {
               description = '$description\n\n$nameDescription';
-              requestName = (key + path).toCamel;
+              requestName = (key + processedPath).toCamel;
             } else {
-              requestName = operationIdName ?? (key + path).toCamel;
+              requestName = operationIdName ?? (key + processedPath).toCamel;
             }
           }
 
@@ -696,7 +707,7 @@ class OpenApiParser {
             operationId: rawOperationId,
             externalDocsUrl: externalDocsUrl,
             requestType: HttpRequestType.fromString(key)!,
-            route: path,
+            route: processedPath,
             contentType: resultContentType,
             returnType: returnType,
             parameters: parameters,
@@ -727,6 +738,48 @@ class OpenApiParser {
         });
       });
     });
+    
+    // Post-process to handle duplicate request names within each client
+    for (final client in restClients) {
+      final requestNameCounts = <String, int>{};
+      final requestsWithDuplicates = <int>[];
+      
+      // First pass: count occurrences of each request name
+      for (var i = 0; i < client.requests.length; i++) {
+        final name = client.requests[i].name;
+        requestNameCounts[name] = (requestNameCounts[name] ?? 0) + 1;
+        if ((requestNameCounts[name] ?? 0) > 1) {
+          requestsWithDuplicates.add(i);
+        }
+      }
+      
+      // Second pass: add suffix to duplicate names
+      if (requestsWithDuplicates.isNotEmpty) {
+        final nameSuffixes = <String, int>{};
+        for (var i = 0; i < client.requests.length; i++) {
+          final request = client.requests[i];
+          if ((requestNameCounts[request.name] ?? 0) > 1) {
+            final currentCount = nameSuffixes[request.name] ?? 0;
+            nameSuffixes[request.name] = currentCount + 1;
+            // Only add suffix for second and subsequent occurrences
+            if (currentCount > 0) {
+              // Create a new request with the updated name
+              client.requests[i] = UniversalRequest(
+                name: '${request.name}${currentCount + 1}',
+                description: request.description,
+                requestType: request.requestType,
+                route: request.route,
+                contentType: request.contentType,
+                returnType: request.returnType,
+                parameters: request.parameters,
+                isDeprecated: request.isDeprecated,
+              );
+            }
+          }
+        }
+      }
+    }
+    
     return restClients;
   }
 

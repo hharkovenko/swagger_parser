@@ -46,6 +46,7 @@ class SWPConfig {
     this.mergeOutputs = false,
     this.includeIfNull = false,
     this.inferRequiredFromNullable = false,
+    this.stripQueryParamsFromPath = false,
   });
 
   /// Internal constructor of [SWPConfig]
@@ -85,6 +86,7 @@ class SWPConfig {
     required this.dartMappableConvenientWhen,
     required this.includeIfNull,
     required this.inferRequiredFromNullable,
+    required this.stripQueryParamsFromPath,
     this.fallbackUnion,
   });
 
@@ -292,6 +294,9 @@ class SWPConfig {
         yamlMap['infer_required_from_nullable'] as bool? ??
             rootConfig?.inferRequiredFromNullable;
 
+    final stripQueryParamsFromPath =
+        yamlMap['strip_query_params_from_path'] as bool? ??
+            rootConfig?.stripQueryParamsFromPath;
     // Default config
     final dc = SWPConfig(name: name, outputDirectory: outputDirectory);
 
@@ -335,6 +340,8 @@ class SWPConfig {
       includeIfNull: includeIfNull ?? dc.includeIfNull,
       inferRequiredFromNullable:
           inferRequiredFromNullable ?? dc.inferRequiredFromNullable,
+      stripQueryParamsFromPath:
+          stripQueryParamsFromPath ?? dc.stripQueryParamsFromPath,
     );
   }
 
@@ -529,35 +536,39 @@ class SWPConfig {
   /// Only applies when schema has no explicit required array.
   final bool inferRequiredFromNullable;
 
+  /// Optional. If `true`, strip query parameter templates from API paths.
+  /// For example, "/api/path{?param1,param2}" becomes "/api/path".
+  /// This is useful for schemas that include RFC 6570 URI templates.
+  final bool stripQueryParamsFromPath;
+
   /// Convert [SWPConfig] to [GeneratorConfig]
   GeneratorConfig toGeneratorConfig() {
     return GeneratorConfig(
-      name: name,
-      outputDirectory: outputDirectory,
-      language: language,
-      jsonSerializer: jsonSerializer,
-      defaultContentType: defaultContentType,
-      extrasParameterByDefault: extrasParameterByDefault,
-      dioOptionsParameterByDefault: dioOptionsParameterByDefault,
+        name: name,
+        outputDirectory: outputDirectory,
+        language: language,
+        jsonSerializer: jsonSerializer,
+        defaultContentType: defaultContentType,
+        extrasParameterByDefault: extrasParameterByDefault,
+        dioOptionsParameterByDefault: dioOptionsParameterByDefault,
       addOpenApiMetadata: addOpenApiMetadata,
-      rootClient: rootClient,
-      rootClientName: rootClientName,
-      clientPostfix: clientPostfix,
-      exportFile: exportFile,
-      putClientsInFolder: putClientsInFolder,
-      enumsToJson: enumsToJson,
-      unknownEnumValue: unknownEnumValue,
-      markFilesAsGenerated: markFilesAsGenerated,
-      originalHttpResponse: originalHttpResponse,
-      replacementRules: replacementRules,
-      generateValidator: generateValidator,
-      useFreezed3: useFreezed3,
-      useMultipartFile: useMultipartFile,
-      fallbackUnion: fallbackUnion,
-      dartMappableConvenientWhen: dartMappableConvenientWhen,
-      mergeOutputs: mergeOutputs,
-      includeIfNull: includeIfNull,
-    );
+        rootClient: rootClient,
+        rootClientName: rootClientName,
+        clientPostfix: clientPostfix,
+        exportFile: exportFile,
+        putClientsInFolder: putClientsInFolder,
+        enumsToJson: enumsToJson,
+        unknownEnumValue: unknownEnumValue,
+        markFilesAsGenerated: markFilesAsGenerated,
+        originalHttpResponse: originalHttpResponse,
+        replacementRules: replacementRules,
+        generateValidator: generateValidator,
+        useFreezed3: useFreezed3,
+        useMultipartFile: useMultipartFile,
+        fallbackUnion: fallbackUnion,
+        dartMappableConvenientWhen: dartMappableConvenientWhen,
+        mergeOutputs: mergeOutputs,
+        includeIfNull: includeIfNull);
   }
 
   /// Convert [SWPConfig] to [ParserConfig]
@@ -580,6 +591,7 @@ class SWPConfig {
       includeTags: includeTags,
       fallbackClient: fallbackClient,
       inferRequiredFromNullable: inferRequiredFromNullable,
+      stripQueryParamsFromPath: stripQueryParamsFromPath,
     );
   }
 }

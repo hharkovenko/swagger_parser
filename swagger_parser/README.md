@@ -170,6 +170,10 @@ swagger_parser:
   # DART ONLY
   # Optional. Set `true` to use MultipartFile instead of File as argument type for file parameters.
   use_multipart_file: false
+  # Optional. If `true`, strip query parameter templates from API paths.
+  # For example, "/api/path{?param1,param2}" becomes "/api/path".
+  # This is useful for schemas that include RFC 6570 URI templates.
+  strip_query_params_from_path: false
 
   # DART ONLY
   # Optional. Set tags to be excluded on endpoint generation.
