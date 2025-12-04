@@ -2892,4 +2892,150 @@ class AnimalSealedDog extends AnimalSealed implements Dog {
       expect(generated.content, expectedContents);
     });
   });
+  group('Compute functions', () {
+        test('dart + json_serializable', () async {
+      final dataClass = UniversalComponentClass(
+        name: 'ClassName',
+        imports: const {},
+        description: 'Test class',
+        parameters: {
+          const UniversalType(
+            type: 'string',
+            description: 'Some string',
+            name: 'stringType',
+            isRequired: true,
+          ),
+          const UniversalType(
+            type: 'string',
+            description: 'Default value',
+            name: 'defaultType',
+            defaultValue: 'str',
+            isRequired: true,
+          ),
+          const UniversalType(
+            type: 'string',
+            description: 'JsonKey here',
+            name: 'jsonKeyValue',
+            jsonKey: 'json_key_value',
+            isRequired: true,
+          ),
+          const UniversalType(
+            type: 'string',
+            description: 'Mega mind',
+            name: 'megaMind',
+            jsonKey: 'mega_MIND',
+            isRequired: true,
+          ),
+          const UniversalType(
+            type: 'object',
+            description: '',
+            name: 'emptyDescription',
+            isRequired: true,
+          ),
+          const UniversalType(
+            type: 'string',
+            description: 'List of data\nThis data is a list',
+            wrappingCollections: [UniversalCollections.list],
+            name: 'list',
+            isRequired: true,
+          ),
+        },
+      );
+      const fillController = FillController(
+        config: GeneratorConfig(name: '', outputDirectory: ''),
+      );
+      final filledContent = fillController.fillDtoContent(dataClass);
+      const expectedContents = r'''
+import 'package:json_annotation/json_annotation.dart';
+
+part 'class_name.g.dart';
+
+/// Test class
+@JsonSerializable()
+class ClassName {
+  const ClassName({
+    required this.stringType,
+    required this.jsonKeyValue,
+    required this.megaMind,
+    required this.emptyDescription,
+    required this.list,
+    this.defaultType = 'str',
+  });
+  
+  factory ClassName.fromJson(Map<String, Object?> json) => _$ClassNameFromJson(json);
+  
+  /// Some string
+  final String stringType;
+
+  /// Default value
+  final String defaultType;
+
+  /// JsonKey here
+  @JsonKey(name: 'json_key_value')
+  final String jsonKeyValue;
+
+  /// Mega mind
+  @JsonKey(name: 'mega_MIND')
+  final String megaMind;
+  final dynamic emptyDescription;
+
+  /// List of data.
+  /// This data is a list.
+  final List<String> list;
+
+  Map<String, Object?> toJson() => _$ClassNameToJson(this);
+}
+''';
+      expect(filledContent.content, expectedContents);
+    });
+
+    test('dart + freezed', () async {
+      final dataClass = UniversalComponentClass(
+        name: 'ClassName',
+        imports: const {},
+        parameters: {
+          const UniversalType(
+            type: 'string',
+            name: 'stringType',
+            isRequired: true,
+          ),
+   
+        },
+      );
+      const fillController = FillController(
+        config: GeneratorConfig(
+          name: '',
+          outputDirectory: '',
+          jsonSerializer: JsonSerializer.freezed,
+          computeParsing: true
+        ),
+      );
+      final filledContent = fillController.fillDtoContent(dataClass);
+      const expectedContents = r'''
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'class_name.freezed.dart';
+part 'class_name.g.dart';
+
+@Freezed()
+class ClassName with _$ClassName {
+  const factory ClassName({
+    required String stringType,
+  }) = _ClassName;
+  
+  factory ClassName.fromJson(Map<String, Object?> json) => _$ClassNameFromJson(json);
+}
+
+///Generated mapping functions for compute() serialization and deserialization.
+
+Map<String, dynamic> serializeClassName(ClassName object) => object.toJson();
+ClassName deserializeClassName(Map<String, dynamic> json) => ClassName.fromJson(json);
+
+List<Map<String, dynamic>> serializeClassNameList(List<ClassName> objects) => objects.map((e) => e.toJson()).toList();
+List<ClassName> deserializeClassNameList(List<Map<String, dynamic>> json) => json.map((e) => ClassName.fromJson(e)).toList();
+''';
+      expect(filledContent.content, expectedContents);
+    });
+
+  });
 }

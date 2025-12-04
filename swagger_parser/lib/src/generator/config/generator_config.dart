@@ -5,32 +5,32 @@ import 'package:swagger_parser/src/parser/model/replacement_rule.dart';
 /// The configuration that the Generator uses
 class GeneratorConfig {
   /// Creates a  [GeneratorConfig].
-  const GeneratorConfig({
-    required this.name,
-    required this.outputDirectory,
-    this.language = ProgrammingLanguage.dart,
-    this.jsonSerializer = JsonSerializer.jsonSerializable,
-    this.defaultContentType = 'application/json',
-    this.rootClient = true,
-    this.extrasParameterByDefault = false,
-    this.dioOptionsParameterByDefault = false,
-    this.rootClientName = 'RestClient',
-    this.clientPostfix,
-    this.exportFile = true,
-    this.putClientsInFolder = false,
-    this.enumsToJson = false,
-    this.unknownEnumValue = true,
-    this.markFilesAsGenerated = false,
-    this.originalHttpResponse = false,
-    this.replacementRules = const [],
-    this.generateValidator = false,
-    this.useFreezed3 = false,
-    this.useMultipartFile = false,
-    this.fallbackUnion,
-    this.dartMappableConvenientWhen = true,
-    this.mergeOutputs = false,
-    this.includeIfNull = false,
-  });
+  const GeneratorConfig(
+      {required this.name,
+      required this.outputDirectory,
+      this.language = ProgrammingLanguage.dart,
+      this.jsonSerializer = JsonSerializer.jsonSerializable,
+      this.defaultContentType = 'application/json',
+      this.rootClient = true,
+      this.extrasParameterByDefault = false,
+      this.dioOptionsParameterByDefault = false,
+      this.rootClientName = 'RestClient',
+      this.clientPostfix,
+      this.exportFile = true,
+      this.putClientsInFolder = false,
+      this.enumsToJson = false,
+      this.unknownEnumValue = true,
+      this.markFilesAsGenerated = false,
+      this.originalHttpResponse = false,
+      this.replacementRules = const [],
+      this.generateValidator = false,
+      this.useFreezed3 = false,
+      this.useMultipartFile = false,
+      this.fallbackUnion,
+      this.dartMappableConvenientWhen = true,
+      this.mergeOutputs = false,
+      this.includeIfNull = false,
+      this.computeParsing = false});
 
   /// Optional. Set API name for folder and export file or merged output file
   /// If not specified, the file name is used.
@@ -143,4 +143,8 @@ class GeneratorConfig {
   /// Optional. Set `true` to generate includeIfNull annotations for nullable fields.
   /// If set to `false`, includeIfNull annotations will not be generated.
   final bool includeIfNull;
+
+  /// DART ONLY
+  /// Optional. Set `true` to add `parser: Parser.FlutterCompute` to generated retrofit rest clients
+  final bool computeParsing;
 }

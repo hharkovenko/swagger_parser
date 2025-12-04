@@ -12,6 +12,7 @@ String dartRetrofitClientTemplate({
   required String defaultContentType,
   required bool useMultipartFile,
   bool extrasParameterByDefault = false,
+  bool computeParsing = false,
   bool dioOptionsParameterByDefault = false,
   bool originalHttpResponse = false,
   String? fileName,
@@ -21,11 +22,11 @@ String dartRetrofitClientTemplate({
       .toSet();
   final sb = StringBuffer('''
 ${_convertImport(restClient)}${ioImport(parameterTypes, useMultipartFile: useMultipartFile)}import 'package:dio/dio.dart'${_hideHeaders(restClient, defaultContentType)};
-import 'package:retrofit/retrofit.dart';
+import 'package:retrofit/retrofit.dart';${computeParsing ? "\nimport 'package:flutter/foundation.dart';" : ''}
 ${dartImports(imports: restClient.imports, pathPrefix: '../models/')}
 part '${fileName ?? name.toSnake}.g.dart';
 
-@RestApi()
+@RestApi(${computeParsing ? 'parser: Parser.FlutterCompute' : ''})
 abstract class $name {
   factory $name(Dio dio, {String? baseUrl}) = _$name;
 ''');

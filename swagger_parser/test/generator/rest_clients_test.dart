@@ -2692,6 +2692,40 @@ abstract class ClassNameClient {
       expect(filledContent.content, expectedContents);
     });
 
+  test('retrofit compute parsing test', () async {
+      const restClient = UniversalRestClient(
+        name: 'ClassName',
+        imports: {},
+        requests: [
+          UniversalRequest(
+            name: 'getRequest',
+            requestType: HttpRequestType.get,
+            route: '/request',
+            returnType: UniversalType(type: 'string', isRequired: true),
+            parameters: [],
+          ),
+        ],
+      );
+      const fillController = FillController(
+        config: GeneratorConfig(name: '', outputDirectory: '', computeParsing: true),
+      );
+      final filledContent = fillController.fillRestClientContent(restClient);
+      const expectedContents = '''
+import 'package:dio/dio.dart';
+import 'package:retrofit/retrofit.dart';
+
+part 'class_name_client.g.dart';
+
+@RestApi(parser: Parser.FlutterCompute)
+abstract class ClassNameClient {
+  factory ClassNameClient(Dio dio, {String? baseUrl}) = _ClassNameClient;
+
+  @GET('/request')
+  Future<String> getRequest();
+}
+''';
+      expect(filledContent.content, expectedContents);
+    });
     test('Kotlin nullability of request parameters', () async {
       const restClient = UniversalRestClient(
         name: 'ClassName',

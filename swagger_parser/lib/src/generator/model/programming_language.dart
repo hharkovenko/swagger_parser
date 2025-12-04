@@ -51,6 +51,7 @@ enum ProgrammingLanguage {
     required bool useMultipartFile,
     required bool dartMappableConvenientWhen,
     required bool includeIfNull,
+    required bool computeParsing,
     String? fallbackUnion,
   }) {
     switch (this) {
@@ -113,6 +114,7 @@ enum ProgrammingLanguage {
     required bool markFilesAsGenerated,
     required String defaultContentType,
     required bool useMultipartFile,
+    bool computeParsing = false,
     bool extrasParameterByDefault = false,
     bool dioOptionsParameterByDefault = false,
     bool originalHttpResponse = false,
@@ -128,7 +130,7 @@ enum ProgrammingLanguage {
             originalHttpResponse: originalHttpResponse,
             useMultipartFile: useMultipartFile,
             fileName: fileName,
-          ),
+            computeParsing: computeParsing),
         kotlin =>
           kotlinRetrofitClientTemplate(restClient: restClient, name: name),
       };

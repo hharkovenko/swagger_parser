@@ -208,6 +208,11 @@ swagger_parser:
   # - Properties with nullable: true remain optional
   # If the schema defines a required array, this option has no effect.
   infer_required_from_nullable: false
+
+  # DART ONLY
+  # Optional. Set `true` to add `parser: Parser.FlutterCompute` to generated retrofit rest clients. 
+  # Th
+  use_compute_parsing: false
 ```
 
 For multiple schemes:

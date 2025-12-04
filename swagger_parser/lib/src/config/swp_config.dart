@@ -45,6 +45,7 @@ class SWPConfig {
     this.mergeOutputs = false,
     this.includeIfNull = false,
     this.inferRequiredFromNullable = false,
+    this.computeParsing = false,
   });
 
   /// Internal constructor of [SWPConfig]
@@ -83,6 +84,7 @@ class SWPConfig {
     required this.dartMappableConvenientWhen,
     required this.includeIfNull,
     required this.inferRequiredFromNullable,
+    required this.computeParsing,
     this.fallbackUnion,
   });
 
@@ -288,49 +290,51 @@ class SWPConfig {
         yamlMap['infer_required_from_nullable'] as bool? ??
             rootConfig?.inferRequiredFromNullable;
 
+    final computeParsing =
+        yamlMap['use_compute_parsing'] as bool? ?? rootConfig?.computeParsing;
     // Default config
     final dc = SWPConfig(name: name, outputDirectory: outputDirectory);
 
     return SWPConfig._(
-      schemaPath: schemaPath,
-      schemaUrl: schemaUrl,
-      outputDirectory: outputDirectory,
-      name: name,
-      pathMethodName: pathMethodName ?? dc.pathMethodName,
-      defaultContentType: defaultContentType ?? dc.defaultContentType,
-      extrasParameterByDefault:
-          extrasParameterByDefault ?? dc.extrasParameterByDefault,
-      dioOptionsParameterByDefault:
-          dioOptionsParameterByDefault ?? dc.dioOptionsParameterByDefault,
-      mergeClients: mergeClients ?? dc.mergeClients,
-      enumsParentPrefix: enumsParentPrefix ?? dc.enumsParentPrefix,
-      skippedParameters: skippedParameters ?? dc.skippedParameters,
-      exportFile: exportFile ?? dc.exportFile,
-      language: language ?? dc.language,
-      jsonSerializer: jsonSerializer ?? dc.jsonSerializer,
-      rootClient: rootClient ?? dc.rootClient,
-      rootClientName: rootClientName ?? dc.rootClientName,
-      clientPostfix: clientPostfix?.trim() ?? dc.clientPostfix,
-      putClientsInFolder: putClientsInFolder ?? dc.putClientsInFolder,
-      enumsToJson: enumsToJson ?? dc.enumsToJson,
-      unknownEnumValue: unknownEnumValue ?? dc.unknownEnumValue,
-      markFilesAsGenerated: markFilesAsGenerated ?? dc.markFilesAsGenerated,
-      originalHttpResponse: originalHttpResponse ?? dc.originalHttpResponse,
-      replacementRules: replacementRules ?? dc.replacementRules,
-      generateValidator: generateValidator ?? dc.generateValidator,
-      useXNullable: useXNullable ?? dc.useXNullable,
-      useFreezed3: useFreezed3 ?? dc.useFreezed3,
-      useMultipartFile: useMultipartFile ?? dc.useMultipartFile,
-      fallbackUnion: fallbackUnion,
-      excludeTags: excludedTags ?? dc.excludeTags,
-      includeTags: includedTags ?? dc.includeTags,
-      fallbackClient: fallbackClient ?? dc.fallbackClient,
-      mergeOutputs: mergeOutputs ?? dc.mergeOutputs,
-      dartMappableConvenientWhen: dartMappableConvenientWhen,
-      includeIfNull: includeIfNull ?? dc.includeIfNull,
-      inferRequiredFromNullable:
-          inferRequiredFromNullable ?? dc.inferRequiredFromNullable,
-    );
+        schemaPath: schemaPath,
+        schemaUrl: schemaUrl,
+        outputDirectory: outputDirectory,
+        name: name,
+        pathMethodName: pathMethodName ?? dc.pathMethodName,
+        defaultContentType: defaultContentType ?? dc.defaultContentType,
+        extrasParameterByDefault:
+            extrasParameterByDefault ?? dc.extrasParameterByDefault,
+        dioOptionsParameterByDefault:
+            dioOptionsParameterByDefault ?? dc.dioOptionsParameterByDefault,
+        mergeClients: mergeClients ?? dc.mergeClients,
+        enumsParentPrefix: enumsParentPrefix ?? dc.enumsParentPrefix,
+        skippedParameters: skippedParameters ?? dc.skippedParameters,
+        exportFile: exportFile ?? dc.exportFile,
+        language: language ?? dc.language,
+        jsonSerializer: jsonSerializer ?? dc.jsonSerializer,
+        rootClient: rootClient ?? dc.rootClient,
+        rootClientName: rootClientName ?? dc.rootClientName,
+        clientPostfix: clientPostfix?.trim() ?? dc.clientPostfix,
+        putClientsInFolder: putClientsInFolder ?? dc.putClientsInFolder,
+        enumsToJson: enumsToJson ?? dc.enumsToJson,
+        unknownEnumValue: unknownEnumValue ?? dc.unknownEnumValue,
+        markFilesAsGenerated: markFilesAsGenerated ?? dc.markFilesAsGenerated,
+        originalHttpResponse: originalHttpResponse ?? dc.originalHttpResponse,
+        replacementRules: replacementRules ?? dc.replacementRules,
+        generateValidator: generateValidator ?? dc.generateValidator,
+        useXNullable: useXNullable ?? dc.useXNullable,
+        useFreezed3: useFreezed3 ?? dc.useFreezed3,
+        useMultipartFile: useMultipartFile ?? dc.useMultipartFile,
+        fallbackUnion: fallbackUnion,
+        excludeTags: excludedTags ?? dc.excludeTags,
+        includeTags: includedTags ?? dc.includeTags,
+        fallbackClient: fallbackClient ?? dc.fallbackClient,
+        mergeOutputs: mergeOutputs ?? dc.mergeOutputs,
+        dartMappableConvenientWhen: dartMappableConvenientWhen,
+        includeIfNull: includeIfNull ?? dc.includeIfNull,
+        inferRequiredFromNullable:
+            inferRequiredFromNullable ?? dc.inferRequiredFromNullable,
+        computeParsing: computeParsing ?? dc.computeParsing);
   }
 
   /// Creates a [SWPConfig] from [YamlMap] with CLI [argResults] overrides.
@@ -520,34 +524,38 @@ class SWPConfig {
   /// Only applies when schema has no explicit required array.
   final bool inferRequiredFromNullable;
 
+  /// DART ONLY
+  /// Optional. Set `true` to add `parser: Parser.FlutterCompute` to generated retrofit rest clients
+  final bool computeParsing;
+
   /// Convert [SWPConfig] to [GeneratorConfig]
   GeneratorConfig toGeneratorConfig() {
     return GeneratorConfig(
-      name: name,
-      outputDirectory: outputDirectory,
-      language: language,
-      jsonSerializer: jsonSerializer,
-      defaultContentType: defaultContentType,
-      extrasParameterByDefault: extrasParameterByDefault,
-      dioOptionsParameterByDefault: dioOptionsParameterByDefault,
-      rootClient: rootClient,
-      rootClientName: rootClientName,
-      clientPostfix: clientPostfix,
-      exportFile: exportFile,
-      putClientsInFolder: putClientsInFolder,
-      enumsToJson: enumsToJson,
-      unknownEnumValue: unknownEnumValue,
-      markFilesAsGenerated: markFilesAsGenerated,
-      originalHttpResponse: originalHttpResponse,
-      replacementRules: replacementRules,
-      generateValidator: generateValidator,
-      useFreezed3: useFreezed3,
-      useMultipartFile: useMultipartFile,
-      fallbackUnion: fallbackUnion,
-      dartMappableConvenientWhen: dartMappableConvenientWhen,
-      mergeOutputs: mergeOutputs,
-      includeIfNull: includeIfNull,
-    );
+        name: name,
+        outputDirectory: outputDirectory,
+        language: language,
+        jsonSerializer: jsonSerializer,
+        defaultContentType: defaultContentType,
+        extrasParameterByDefault: extrasParameterByDefault,
+        dioOptionsParameterByDefault: dioOptionsParameterByDefault,
+        rootClient: rootClient,
+        rootClientName: rootClientName,
+        clientPostfix: clientPostfix,
+        exportFile: exportFile,
+        putClientsInFolder: putClientsInFolder,
+        enumsToJson: enumsToJson,
+        unknownEnumValue: unknownEnumValue,
+        markFilesAsGenerated: markFilesAsGenerated,
+        originalHttpResponse: originalHttpResponse,
+        replacementRules: replacementRules,
+        generateValidator: generateValidator,
+        useFreezed3: useFreezed3,
+        useMultipartFile: useMultipartFile,
+        fallbackUnion: fallbackUnion,
+        dartMappableConvenientWhen: dartMappableConvenientWhen,
+        mergeOutputs: mergeOutputs,
+        includeIfNull: includeIfNull,
+        computeParsing: computeParsing);
   }
 
   /// Convert [SWPConfig] to [ParserConfig]

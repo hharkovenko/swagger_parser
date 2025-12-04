@@ -2,6 +2,7 @@ import 'package:swagger_parser/src/generator/config/generator_config.dart';
 import 'package:swagger_parser/src/generator/model/generated_file.dart';
 import 'package:swagger_parser/src/generator/model/json_serializer.dart';
 import 'package:swagger_parser/src/generator/model/programming_language.dart';
+import 'package:swagger_parser/src/generator/templates/dart_compute_dto_template.dart';
 import 'package:swagger_parser/src/parser/model/normalized_identifier.dart';
 import 'package:swagger_parser/src/parser/swagger_parser_core.dart';
 import 'package:swagger_parser/src/utils/base_utils.dart';
@@ -21,23 +22,30 @@ final class FillController {
   final GeneratorConfig config;
 
   /// Return [GeneratedFile] generated from given [UniversalDataClass]
-  GeneratedFile fillDtoContent(UniversalDataClass dataClass) => GeneratedFile(
+  GeneratedFile fillDtoContent(UniversalDataClass dataClass) {
+    final dtoContent = config.language.dtoFileContent(
+      computeParsing: config.computeParsing,
+      dataClass,
+      jsonSerializer: config.jsonSerializer,
+      enumsToJson: config.enumsToJson,
+      unknownEnumValue: config.unknownEnumValue,
+      markFilesAsGenerated: config.markFilesAsGenerated,
+      generateValidator: config.generateValidator,
+      useFreezed3: config.useFreezed3,
+      useMultipartFile: config.useMultipartFile,
+      dartMappableConvenientWhen: config.dartMappableConvenientWhen,
+      includeIfNull: config.includeIfNull,
+      fallbackUnion: config.fallbackUnion,
+    );
+    final content = StringBuffer(dtoContent);
+    if (config.computeParsing && config.language == ProgrammingLanguage.dart) {
+      content.write(dartComputeDtoTemplate(dataClass));
+    }
+    return GeneratedFile(
         name:
             'models/${_resolveDtoFileBaseName(dataClass)}.${config.language.fileExtension}',
-        content: config.language.dtoFileContent(
-          dataClass,
-          jsonSerializer: config.jsonSerializer,
-          enumsToJson: config.enumsToJson,
-          unknownEnumValue: config.unknownEnumValue,
-          markFilesAsGenerated: config.markFilesAsGenerated,
-          generateValidator: config.generateValidator,
-          useFreezed3: config.useFreezed3,
-          useMultipartFile: config.useMultipartFile,
-          dartMappableConvenientWhen: config.dartMappableConvenientWhen,
-          includeIfNull: config.includeIfNull,
-          fallbackUnion: config.fallbackUnion,
-        ),
-      );
+        content: content.toString());
+  }
 
   String _resolveDtoFileBaseName(UniversalDataClass dataClass) {
     if (config.language != ProgrammingLanguage.dart) {
@@ -93,6 +101,7 @@ final class FillController {
         dioOptionsParameterByDefault: config.dioOptionsParameterByDefault,
         originalHttpResponse: config.originalHttpResponse,
         useMultipartFile: config.useMultipartFile,
+        computeParsing: config.computeParsing,
         fileName: fileName,
       ),
     );
